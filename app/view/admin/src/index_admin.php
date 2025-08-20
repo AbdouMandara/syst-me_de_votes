@@ -252,19 +252,33 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                         <input type="datetime-local" name="date_et_heure_fin_vote" id="date_et_heure_de_fin" value="<?= $resultat['date_fin']?>">
                     </div>
 
+                    <!-- Pour génerer le statut -->
+
                     <label class="bloc_de_statut">
                             <label >Statut</label>
 
                         <div class="grille_des_status">
-                            <label class="statut_de_vote">    
-                                <input type="radio" name="Actif" id="Actif">
-                                <label for="Actif">Actif </label>
-                            </label>
-                            
-                            <label class="statut_de_vote">    
-                                <input type="radio" name="Terminé" id="Terminé">
-                                <label for="Terminé">Terminé </label>
-                            </label>
+                            <?php
+                                $sql_pour_obtenir_statut_vote ='SELECT DISTINCT statut_du_vote FROM votes ';
+                                $requete_pour_obtenir_statut_vote = $connexion->prepare($sql_pour_obtenir_statut_vote);
+                                $requete_pour_obtenir_statut_vote->execute();
+                                $resultat_de_la_requete_pour_obtenir_statut_vote = $requete_pour_obtenir_statut_vote->fetchAll();
+                                foreach ($resultat_de_la_requete_pour_obtenir_statut_vote as $resultat_statut_vote) {
+
+                            ?>
+                                <label class="statut_de_vote">
+                                    <?php $status_value = htmlspecialchars($resultat_statut_vote['statut_du_vote']); ?>
+                                    <input type="radio" name="statut_du_vote" value="<?=$resultat_statut_vote['statut_du_vote'] ?>" id="statut_<?= $resultat_statut_vote['statut_du_vote'] ?>" <?= ($resultat['statut_du_vote'] === $resultat_statut_vote['statut_du_vote']) ? 'checked' : '' ?> >
+                                    <label for="statut_<?=$resultat_statut_vote['statut_du_vote'] ?>"><?= $resultat_statut_vote['statut_du_vote'] ?> </label>
+                                </label>
+                                
+                                <!-- <label class="statut_de_vote">    
+                                    <input type="radio" name="Terminé" id="Terminé">
+                                    <label for="Terminé">Terminé </label>
+                                </label> -->
+                                <?php
+                                }
+                                ?>
                         </div>
                     </label>
 

@@ -227,7 +227,7 @@ require_once __DIR__ . '/../../../../config/database.php';
                                 
                                 #Ce qu' on enverra à la bd   Nous récuperons l'id du user    
                                 foreach ($resultat_pour_afficher_options as $resultat_option){
-                                $email_user = $_SESSION['user']['email'];
+                                    $email_user = $_SESSION['user']['email'];
                                     $sql_pour_trouver_id_du_user_votant = "SELECT id FROM user WHERE email = :email";
                                     $requete_pour_trouver_id_du_user_votant = $connexion->prepare($sql_pour_trouver_id_du_user_votant);
                                     $requete_pour_trouver_id_du_user_votant->execute(['email' => $email_user]);

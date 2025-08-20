@@ -137,8 +137,8 @@ class AdminController{
         $_SESSION['modif_réussi'] = 'Modification réussie avec succès';
         return $_SESSION['modif_réussi'];
     }
-    public function modifier_vote_sans_option_3($id_du_vote, $titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $id_option_1_du_vote, $id_option_2_du_vote){
-        $this->nouveau_admin->modification_du_vote_sans_option_3($id_du_vote, $titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $id_option_1_du_vote, $id_option_2_du_vote);
+    public function modifier_vote_sans_option_3($id_du_vote, $titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $id_option_1_du_vote, $id_option_2_du_vote, $statut_du_vote){
+        $this->nouveau_admin->modification_du_vote_sans_option_3($id_du_vote, $titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $id_option_1_du_vote, $id_option_2_du_vote, $statut_du_vote);
         $_SESSION['modif_réussi'] = 'Modification réussie avec succès';
         return $_SESSION['modif_réussi'];
     }

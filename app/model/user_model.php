@@ -190,19 +190,20 @@ class Admin{
     }
 
      //-Modification-  Méthode si l'option 3 est indisponible 
-     public function modification_du_vote_sans_option_3($id_du_vote,$titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $id_option_1_du_vote, $id_option_2_du_vote ){
+     public function modification_du_vote_sans_option_3($id_du_vote,$titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $id_option_1_du_vote, $id_option_2_du_vote, $statut_du_vote ){
 
         // Nouvelle version : on attend les id des options en plus des libellés
         // $option_1_id et $option_2_id doivent être transmis
         // $option_1_du_vote et $option_2_du_vote sont les nouveaux libellés
         // $this->connexion->beginTransaction();
-        $sql_pour_modifier_infos_du_vote ="UPDATE  votes SET titre=:titre_du_vote, description =:description_du_vote, date_fin=:date_et_heure_fin_vote WHERE id=:id_du_vote";
+        $sql_pour_modifier_infos_du_vote ="UPDATE  votes SET titre=:titre_du_vote, description =:description_du_vote, date_fin=:date_et_heure_fin_vote, statut_du_vote = :statut_du_vote WHERE id=:id_du_vote";
         $requete_pour_modifier_infos_du_vote =$this->connexion->prepare($sql_pour_modifier_infos_du_vote);
         $requete_pour_modifier_infos_du_vote->execute([
             "titre_du_vote"=>$titre_du_vote,
             "description_du_vote"=>$description_du_vote,
             "date_et_heure_fin_vote"=>$date_et_heure_fin_vote,
             "id_du_vote"=>$id_du_vote,
+            "statut_du_vote"=>$statut_du_vote
         ]);
 
         // Modifier option 1

@@ -205,7 +205,7 @@ else if ($uri === '/systeme_de_votes/public/index.php/modif_vote') {
         $id_du_vote = $_POST['id_du_vote'];
         $titre_du_vote = $_POST['titre_du_vote'];
         $description_du_vote = $_POST['description_du_vote'];
-        
+
         $option_1_du_vote = $_POST['option_1_du_vote'];
         $option_2_du_vote = $_POST['option_2_du_vote'];
         $option_3_du_vote = $_POST['option_3_du_vote'];   
@@ -214,6 +214,8 @@ else if ($uri === '/systeme_de_votes/public/index.php/modif_vote') {
         $id_option_2_du_vote = $_POST['id_option_2_du_vote'];
         $id_option_3_du_vote = $_POST['id_option_3_du_vote'];
         $date_et_heure_fin_vote = $_POST['date_et_heure_fin_vote'];
+
+        $statut_du_vote = $_POST['statut_du_vote'];
         
         $admin_controller->modifier_vote_avec_option_3($id_du_vote,$titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $option_3_du_vote, $id_option_1_du_vote, $id_option_2_du_vote, $id_option_3_du_vote);
         
@@ -222,7 +224,7 @@ else if ($uri === '/systeme_de_votes/public/index.php/modif_vote') {
             unset($_SESSION['modif_réussi']);
         }
     }else{
-            $id_du_vote = $_POST['id_du_vote'];
+        $id_du_vote = $_POST['id_du_vote'];
             $titre_du_vote = $_POST['titre_du_vote'];
             $description_du_vote = $_POST['description_du_vote'];
             $option_1_du_vote = $_POST['option_1_du_vote'];
@@ -230,7 +232,9 @@ else if ($uri === '/systeme_de_votes/public/index.php/modif_vote') {
             $id_option_1_du_vote = $_POST['id_option_1_du_vote'];
             $id_option_2_du_vote = $_POST['id_option_2_du_vote'];
             $date_et_heure_fin_vote = $_POST['date_et_heure_fin_vote'];
-            $admin_controller->modifier_vote_sans_option_3($id_du_vote, $titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $id_option_1_du_vote, $id_option_2_du_vote);
+            $statut_du_vote = $_POST['statut_du_vote'];
+
+            $admin_controller->modifier_vote_sans_option_3($id_du_vote, $titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $id_option_1_du_vote, $id_option_2_du_vote, $statut_du_vote);
             
             if (isset($_SESSION['modif_réussi'])) {
                 echo '<p class="succès">' .  $_SESSION['modif_réussi'] . '</p>';
