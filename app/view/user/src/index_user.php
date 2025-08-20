@@ -220,18 +220,18 @@ require_once __DIR__ . '/../../../../config/database.php';
 
                                     <div class="errors" id="errors-<?= $resultat['id']?>"></div>
                             <?php
-                            $sql_pour_afficher_options ='SELECT id, libelle FROM option_votes WHERE vote_id='.$resultat['id'];
-                            $requete_pour_afficher_options = $connexion->prepare($sql_pour_afficher_options);
-                            $requete_pour_afficher_options->execute();
-                            $resultat_pour_afficher_options = $requete_pour_afficher_options->fetchAll();
-                            
-                            #Ce qu' on enverra à la bd   Nous récuperons l'id du user    
-                            foreach ($resultat_pour_afficher_options as $resultat_option){
-                               $email_user = $_SESSION['user']['email'];
-                                $sql_pour_trouver_id_du_user_votant = "SELECT id FROM user WHERE email = :email";
-                                $requete_pour_trouver_id_du_user_votant = $connexion->prepare($sql_pour_trouver_id_du_user_votant);
-                                $requete_pour_trouver_id_du_user_votant->execute(['email' => $email_user]);
-                                $resultat_pour_trouver_id_du_user_votant = $requete_pour_trouver_id_du_user_votant->fetch();
+                                $sql_pour_afficher_options ='SELECT id, libelle FROM option_votes WHERE vote_id='.$resultat['id'];
+                                $requete_pour_afficher_options = $connexion->prepare($sql_pour_afficher_options);
+                                $requete_pour_afficher_options->execute();
+                                $resultat_pour_afficher_options = $requete_pour_afficher_options->fetchAll();
+                                
+                                #Ce qu' on enverra à la bd   Nous récuperons l'id du user    
+                                foreach ($resultat_pour_afficher_options as $resultat_option){
+                                $email_user = $_SESSION['user']['email'];
+                                    $sql_pour_trouver_id_du_user_votant = "SELECT id FROM user WHERE email = :email";
+                                    $requete_pour_trouver_id_du_user_votant = $connexion->prepare($sql_pour_trouver_id_du_user_votant);
+                                    $requete_pour_trouver_id_du_user_votant->execute(['email' => $email_user]);
+                                    $resultat_pour_trouver_id_du_user_votant = $requete_pour_trouver_id_du_user_votant->fetch();
                             ?>
 
                                 <input type="hidden" name="user_id" value="<?= $resultat_pour_trouver_id_du_user_votant['id'] ?>"> <!-- Pour l'id du vote choisie-->
@@ -239,7 +239,7 @@ require_once __DIR__ . '/../../../../config/database.php';
                                 <!-- ---------------------------- -->
                                 <label class="bloc_option"> <!-- Je mets tout cela dans un label car quand je cliques sur le label il va me 'checked' le input-->
                                     <!-- Pour l'id de l'option votée -->
-                                    <input type="radio" name="option_vote_id" value="<?= $resultat_option['id'] ?>" id="option-<?= $resultat_option['id'] ?> ?>">
+                                    <input type="radio" name="option_vote_id" value="<?= $resultat_option['id'] ?>" id="option-<?= $resultat_option['id'] ?>">
                                     <label for="option-<?= $resultat_option['id'] ?>"><?= $resultat_option['libelle'] ?></label>
                                 </label>
                             <?php

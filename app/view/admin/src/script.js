@@ -1,7 +1,3 @@
-/*document.addEventListener("DOMContentLoaded", () => {
-
-})*/
-
 // Fonction pour afficher un élement
 function afficherElement(element) {
     element.classList.add("afficher_element");
@@ -15,6 +11,32 @@ function cachage_niveau2(element) {
     element.style.display="none"
 }
 
+//Pour augmenter la hauteur du overflow pour qu'elle soit proportionnelle à celle de l'écran
+function hauteur_overflow(params) {
+    setTimeout(() => {
+        let hauteur_du_body = body.clientHeight;
+        hauteur_du_body = parseFloat(hauteur_du_body);
+        params.style.height = hauteur_du_body + "px";
+    }, 0);
+}
+
+// Pour augmenter nbre d'options
+let nbre_option = 3;
+let id_option_3 =window.id_option_3;
+let libelle_option_3 =window.libelle_option_3;
+function afficher_option(les_options_du_vote, ajouter_option_au_vote) {
+ hauteur_overflow(overflow)
+    les_options_du_vote.insertAdjacentHTML("beforeend",`<input type="text" class="option_${nbre_option}" name="option_${nbre_option}_du_vote" id="${id_option_3}" placeholder="Option ${nbre_option}" value="${libelle_option_3}">`)
+    // les_options_du_vote.insertAdjacentHTML("beforeend",`<input type="hidden" name="id_option_${nbre_option}_du_vote" value="<?= $resultat_pour_avoir_l_id_d_options[2]['id'] ?>">` )
+    nbre_option++
+    if (nbre_option > 3) {
+        ajouter_option_au_vote.disabled=true;
+        ajouter_option_au_vote.removeEventListener("click", afficher_option())
+        ajouter_option_au_vote.style.cursor="no-drop"
+    }
+}
+
+/*____________________________________________________________________________ */
 /* Variable utiliser pour affichage/cachage du formulaire pour ajouter un vote */
 const bouton_pour_ajouter_un_vote = document.querySelector("#ajout_du_vote")
 const formulaire_pour_ajout_vote = document.querySelector("#formulaire_pour_ajout_vote") //Formulaire à remplir pour ajouter un vote
@@ -41,29 +63,6 @@ overflow.addEventListener("click", ()=>{
     cacherElement(formulaire_pour_ajout_vote)
 })
 
-// Pour augmenter le nbre d'options 
-const ajouter_option_au_vote = document.querySelector("#ajouter_option_au_vote")
-const les_options_du_vote = document.querySelector(".les_options_du_vote")
-
-let nbre_option = 3;
-function hauteur_overflow(params) {
-    setTimeout(() => {
-        let hauteur_du_body = body.clientHeight;
-        hauteur_du_body = parseFloat(hauteur_du_body);
-        params.style.height = hauteur_du_body + "px";
-    }, 0);
-}
-function afficher_option(){
- hauteur_overflow(overflow)
-    les_options_du_vote.insertAdjacentHTML("beforeend",`<input type="text" class="option_${nbre_option}" name="option_${nbre_option}_du_vote" id="option" placeholder="Option ${nbre_option}">` )
-    nbre_option++
-    if (nbre_option > 3) {
-        ajouter_option_au_vote.disabled=true;
-        ajouter_option_au_vote.removeEventListener("click", afficher_option)
-        ajouter_option_au_vote.style.cursor="no-drop"
-    }
-}
-ajouter_option_au_vote.addEventListener("click", afficher_option)
 
 const overflow_blanc = document.querySelector(".overflow_blanc")
 const main = document.querySelector("main")
@@ -131,5 +130,16 @@ document.querySelectorAll(".modifier_vote").forEach(btn_modifier_vote =>{
             cacherElement(overflow)
             cacherElement(formulaire_pour_modifier_vote)
         })
-    })
+        
+        
+    // Pour augmenter le nbre d'options 
+//  document.querySelectorAll(".form_modif_votes > .ajouter_option_au_vote").forEach(btn_ajout_option =>{
+//         btn_ajout_option.addEventListener("click", () => {
+//             const les_options_du_vote = document.querySelector(`#formulaire_pour_modifier_vote_${id_btn_modifier_vote} > .les_options_du_vote`)
+//             console.log(les_options_du_vote);
+            
+//             afficher_option(les_options_du_vote, btn_ajout_option)
+//         })
+//     })
+ })
 })

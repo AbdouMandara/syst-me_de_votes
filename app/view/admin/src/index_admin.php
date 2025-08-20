@@ -86,7 +86,7 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                         <input type="text" class="option_2" name="option_2_du_vote" id="option" placeholder="Option 2">
                     </div>
                     
-                    <div id="ajouter_option_au_vote">Ajouter une option</div>
+                    <div id="ajouter_option_au_vote" class="ajouter_option_au_vote">Ajouter une option</div>
                     
                     <div>
                         <label for="date_et_heure_de_fin">Date de fin & heure de fin</label>
@@ -212,10 +212,10 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                 ?>      
 
                 <!-- Formulaire pour modifier un vote  -->
-            <form action="/systeme_de_votes/public/index.php/modif_vote" method="post" class="formulaire_pour_votes" id="formulaire_pour_modifier_vote_<?= $resultat['id'] ?>"
+            <form action="/systeme_de_votes/public/index.php/modif_vote" method="post" class="form_modif_votes formulaire_pour_votes" id="formulaire_pour_modifier_vote_<?= $resultat['id'] ?>"
                         hx-post="/systeme_de_votes/public/index.php/modif_vote"
-                        hx-target="#errors">
-                        <div class="errors" id="errors"></div>
+                        hx-target="#errors_<?= $resultat['id'] ?>">
+                        <div class="errors" id="errors_<?= $resultat['id'] ?>"></div>
                     <span class="fermer-la-modal-vote"  id="fermer-la-modal-pour-modifier-vote-<?= $resultat['id'] ?>">&times;</span>
                     <li>Modification du vote existant</li>
                     <p>Pour modifier ce vote, veuillez remplir les infos suivantes :</p>
@@ -231,17 +231,42 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                     </div>    
                        
                     <div class="les_options_du_vote">
+                        <?php
+                                $sql_pour_avoir_l_id_d_options = "SELECT * FROM option_votes WHERE vote_id = :vote_id";
+                                $requete_pour_avoir_l_id_d_options = $connexion->prepare($sql_pour_avoir_l_id_d_options);
+                                $requete_pour_avoir_l_id_d_options->execute(['vote_id' =>  $resultat['id']]);
+                                $resultat_pour_avoir_l_id_d_options = $requete_pour_avoir_l_id_d_options->fetchAll();          
+                        ?>
                         <label for="option">Options</label>
-                        <input type="text" name="option_1_du_vote" id="option" placeholder="Option 1">
-                        <input type="text" name="option_2_du_vote" id="option" placeholder="Option 2" class="option_2">
+                        <input type="hidden" name="id_option_1_du_vote" value="<?= $resultat_pour_avoir_l_id_d_options[0]['id'] ?>">
+                        <input type="hidden" name="id_option_2_du_vote" value="<?= $resultat_pour_avoir_l_id_d_options[1]['id'] ?>">
+                        
+                        <input type="text" name="option_1_du_vote"  id="option" placeholder="Option 1" value="<?= $resultat_pour_avoir_l_id_d_options[0]['libelle'] ?>">
+                        <input type="text" name="option_2_du_vote" id="option" placeholder="Option 2" class="option_2" value="<?= $resultat_pour_avoir_l_id_d_options[1]['libelle'] ?>">
                     </div>
                     
-                    <div id="ajouter_option_au_vote">Ajouter une option</div>
+                    <!-- <div class="ajouter_option_au_vote"  id="ajouter_option_au_vote_<?= $resultat['id'] ?>">Ajouter une option</div> -->
                     
                     <div>
                         <label for="date_et_heure_de_fin">Date de fin & heure de fin</label>
                         <input type="datetime-local" name="date_et_heure_fin_vote" id="date_et_heure_de_fin" value="<?= $resultat['date_fin']?>">
                     </div>
+
+                    <label class="bloc_de_statut">
+                            <label >Statut</label>
+
+                        <div class="grille_des_status">
+                            <label class="statut_de_vote">    
+                                <input type="radio" name="Actif" id="Actif">
+                                <label for="Actif">Actif </label>
+                            </label>
+                            
+                            <label class="statut_de_vote">    
+                                <input type="radio" name="Terminé" id="Terminé">
+                                <label for="Terminé">Terminé </label>
+                            </label>
+                        </div>
+                    </label>
 
                     <button type="submit" class="btn_pour_ajouter_vote">Modification terminée</button>
             </form>

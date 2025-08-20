@@ -190,14 +190,14 @@ class Admin{
     }
 
      //-Modification-  Méthode si l'option 3 est indisponible 
-     public function modification_du_vote_sans_option_3($id_du_vote,$titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote){
+     public function modification_du_vote_sans_option_3($id_du_vote,$titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $id_option_1_du_vote, $id_option_2_du_vote ){
 
+        // Nouvelle version : on attend les id des options en plus des libellés
+        // $option_1_id et $option_2_id doivent être transmis
+        // $option_1_du_vote et $option_2_du_vote sont les nouveaux libellés
         // $this->connexion->beginTransaction();
-        // $vote_id = $this->connexion->lastInsertId();
-
         $sql_pour_modifier_infos_du_vote ="UPDATE  votes SET titre=:titre_du_vote, description =:description_du_vote, date_fin=:date_et_heure_fin_vote WHERE id=:id_du_vote";
         $requete_pour_modifier_infos_du_vote =$this->connexion->prepare($sql_pour_modifier_infos_du_vote);
-        
         $requete_pour_modifier_infos_du_vote->execute([
             "titre_du_vote"=>$titre_du_vote,
             "description_du_vote"=>$description_du_vote,
@@ -205,33 +205,29 @@ class Admin{
             "id_du_vote"=>$id_du_vote,
         ]);
 
-        
-        // SQL pour insérer les options 1 et 2
-        $sql_pour_modifier_option_1_du_vote = "UPDATE option_votes SET libelle = :option_1_du_vote WHERE vote_id = :id_du_vote, UPDATE option_votes SET libelle = :option_2_du_vote WHERE vote_id = :id_du_vote";
+        // Modifier option 1
+        $sql_pour_modifier_option_1_du_vote = "UPDATE option_votes SET libelle = :option_1_du_vote WHERE id = :option_1_id AND vote_id = :id_du_vote";
         $requete_pour_modifier_option_1_du_vote = $this->connexion->prepare($sql_pour_modifier_option_1_du_vote);
-        
-        
-        // $sql_pour_modifier_option_2_du_vote = "UPDATE option_votes SET libelle = :option_2_du_vote WHERE vote_id = :id_du_vote";
-        // $requete_pour_modifier_option_2_du_vote = $this->connexion->prepare($sql_pour_modifier_option_2_du_vote);
-        
-        // $requete_pour_modifier_option_2_du_vote->execute([
-        //     "option_2_du_vote" => $option_2_du_vote,
-        //     "id_du_vote"=>$id_du_vote
-        // ]);
         $requete_pour_modifier_option_1_du_vote->execute([
             "option_1_du_vote" => $option_1_du_vote,
-            "id_du_vote"=>$id_du_vote,
-            "option_2_du_vote" => $option_2_du_vote,
+            "option_1_id" => $id_option_1_du_vote,
             "id_du_vote"=>$id_du_vote
         ]);
 
-       
+        // Modifier option 2
+        $sql_pour_modifier_option_2_du_vote = "UPDATE option_votes SET libelle = :option_2_du_vote WHERE id = :option_2_id AND vote_id = :id_du_vote";
+        $requete_pour_modifier_option_2_du_vote = $this->connexion->prepare($sql_pour_modifier_option_2_du_vote);
+        $requete_pour_modifier_option_2_du_vote->execute([
+            "option_2_du_vote" => $option_2_du_vote,
+            "option_2_id" => $id_option_2_du_vote,
+            "id_du_vote"=>$id_du_vote
+        ]);
         // $this->connexion->commit();
     }
     
 
     //-Modification- Méthode si l'option 3 est disponible
-        public function modification_du_vote_avec_option_3($id_du_vote, $titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $option_3_du_vote){
+        public function modification_du_vote_avec_option_3($id_du_vote, $titre_du_vote, $description_du_vote, $date_et_heure_fin_vote, $option_1_du_vote, $option_2_du_vote, $option_3_du_vote, $id_option_1_du_vote, $id_option_2_du_vote, $id_option_3_du_vote){
         try{
         $sql_pour_modifier_infos_du_vote ="UPDATE  votes SET titre=:titre_du_vote, description =:description_du_vote, date_fin=:date_et_heure_fin_vote WHERE id=:id_du_vote";
         $requete_pour_modifier_infos_du_vote =$this->connexion->prepare($sql_pour_modifier_infos_du_vote);
@@ -250,6 +246,7 @@ class Admin{
         
         $requete_pour_modifier_option_1_du_vote->execute([
             "option_1_du_vote" => $option_1_du_vote,
+            "option_1_id" => $id_option_1_du_vote,
             "id_du_vote"=>$id_du_vote
         ]);
 
@@ -258,6 +255,7 @@ class Admin{
         
         $requete_pour_modifier_option_2_du_vote->execute([
             "option_2_du_vote" => $option_2_du_vote,
+            "option_2_id" => $id_option_2_du_vote,
             "id_du_vote"=>$id_du_vote
         ]);
 
@@ -266,6 +264,7 @@ class Admin{
         
         $requete_pour_modifier_option_3_du_vote->execute([
             "option_3_du_vote" => $option_3_du_vote,
+            "option_3_id" => $id_option_3_du_vote,
             "id_du_vote"=>$id_du_vote
         ]);
         
