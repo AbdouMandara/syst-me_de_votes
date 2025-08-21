@@ -1,22 +1,32 @@
-// Sélectionne tous les boutons ayant la classe "resultat_vote" et boucle sur chacun
-document.querySelectorAll(".resultat_vote").forEach(bouton => {
+// Exécute après que le DOM soit prêt, et supporte deux classes possibles de boutons
+document.addEventListener('DOMContentLoaded', () => {
+  const boutons = document.querySelectorAll('.resultat_vote, .bouton_pour_voir_resultat');
+  if (!boutons || boutons.length === 0) {
+    console.debug('Aucun bouton de résultat trouvé (.resultat_vote or .bouton_pour_voir_resultat)');
+  }
 
-  // Ajoute un écouteur d'événement "click" sur chaque bouton
-  bouton.addEventListener("click", () => {
+  // Boucle sur chacun des boutons trouvés
+  boutons.forEach(bouton => {
 
-    // Récupère l'ID du vote associé à ce bouton depuis l'attribut data
-    const id = bouton.getAttribute("data-id-du-btn-de-resultat-du-vote");
+    // Ajoute un écouteur d'événement "click" sur chaque bouton
+    bouton.addEventListener("click", () => {
 
-    // Récupère les données correspondant à ce vote depuis l'objet global "données_pour_charts"
-    const data = window.données_pour_charts[id];
+      // Récupère l'ID du vote associé à ce bouton depuis l'attribut data
+      const id = bouton.getAttribute("data-id-du-btn-de-resultat-du-vote");
 
-    // Si aucune donnée n'existe pour cet ID, on affiche une erreur et on sort
-    if (!data) return console.error("Pas de données pour ce vote", id);
+      // Récupère les données correspondant à ce vote depuis l'objet global "données_pour_charts"
+      const data = window.données_pour_charts && window.données_pour_charts[id];
+
+      // Si aucune donnée n'existe pour cet ID, on affiche une erreur et on sort
+      if (!data) {
+        console.error("Pas de données pour ce vote", id, 'window.données_pour_charts =', window.données_pour_charts);
+        return;
+      }
 
     // -----------------------------
     // --- PIE CHART (Camembert) ---
     // -----------------------------
-    const canvasPie = document.getElementById(`graphe-${id}`); // récupère le canvas pour le pie chart
+  const canvasPie = document.getElementById(`graphe-${id}`); // récupère le canvas pour le pie chart
     if (canvasPie) { // vérifie que le canvas existe
       canvasPie.width = 500;  // fixe la largeur du canvas
       canvasPie.height = 500; // fixe la hauteur du canvas
@@ -89,7 +99,7 @@ document.querySelectorAll(".resultat_vote").forEach(bouton => {
     // ----------------------------------
     // --- BAR CHART VERTICAL (Barres) ---
     // ----------------------------------
-    const canvasBar = document.getElementById(`schema-${id}`); // récupère le canvas pour le bar chart
+  const canvasBar = document.getElementById(`schema-${id}`); // récupère le canvas pour le bar chart
     if (canvasBar) { // vérifie que le canvas existe
       canvasBar.width = 500;  // largeur fixe
       canvasBar.height = 500; // hauteur fixe
@@ -162,5 +172,6 @@ document.querySelectorAll(".resultat_vote").forEach(bouton => {
       });
     }
 
-  }); // fin du click event
-}); // fin de la boucle forEach sur les boutons
+    }); // fin du click event
+  }); // fin de la boucle forEach sur les boutons
+}); // fin DOMContentLoaded

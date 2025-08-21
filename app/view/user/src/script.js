@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.querySelectorAll(".bouton_pour_voir_resultat").forEach(bouton =>{
     bouton.addEventListener("click", () => {
 
-            const id_bouton_cliqué = bouton.getAttribute("data-id-du-btn-vote-terminé")
+            const id_bouton_cliqué = bouton.getAttribute("data-id-du-btn-de-resultat-du-vote")
             const bloc_pour_voir_résultat = document.getElementById(`bloc-vote-cliqué-pour-voir-résultat-${id_bouton_cliqué}`)
 
             afficherElement(bloc_pour_voir_résultat);

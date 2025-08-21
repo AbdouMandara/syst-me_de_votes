@@ -2,7 +2,6 @@
 session_start();
 require_once __DIR__ . '/../../../../config/database.php';
 require_once __DIR__ . '/../../../controller/user_controller.php'
-// require_once __DIR__ . '/../../../../public/index.php';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -11,7 +10,6 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css">
     <script src="/systeme_de_votes/public/htmx.min-v-2.0.6.js" defer></script>
-    <!-- <script src="/systeme_de_votes/public/sweetAlert.min-v-2.12.js" defer></script> -->
     <title>Accueil | User</title>
 </head>
 <body>
@@ -184,7 +182,7 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                         <!-- Change image -->
                         <div class="date_de_fin"><img src="../img/users.svg" alt=""> <span>Terminé : <?= $resultat['date_fin']?></span></div>
                     </div>
-                        <button class="bouton_pour_voir_resultat"  id="bouton_pour_voir_resultat_<?= $resultat['id'] ?>" data-id-du-btn-vote-terminé="<?= $resultat['id'] ?>" >Voir les résultats</button>
+                        <button class="bouton_pour_voir_resultat  resultat_vote"  id="bouton_pour_voir_resultat_<?= $resultat['id'] ?>" data-id-du-btn-de-resultat-du-vote="<?= $resultat['id'] ?>" >Voir les résultats</button>
                     </div>
                         <?php
                     }
@@ -400,51 +398,64 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M280-120v-80h160v-124q-49-11-87.5-41.5T296-442q-75-9-125.5-65.5T120-640v-40q0-33 23.5-56.5T200-760h80v-80h400v80h80q33 0 56.5 23.5T840-680v40q0 76-50.5 132.5T664-442q-18 46-56.5 76.5T520-324v124h160v80H280Zm0-408v-152h-80v40q0 38 22 68.5t58 43.5Zm200 128q50 0 85-35t35-85v-240H360v240q0 50 35 85t85 35Zm200-128q36-13 58-43.5t22-68.5v-40h-80v152Zm-200-52Z"/></svg>
                                 <p>Option la plus votée</p>
                             </div>
-
              
-                <div class="détail_option_plus_voté">
-                    <h4><?= htmlspecialchars($libelle_option_la_plus_votee) ?></h4>
-                    <p><?= htmlspecialchars($nb_fois_option_plus_voté) ?> votes (<?= htmlspecialchars($pourcentage_option_plus_voté) ?>%)</p>
-                </div>
-
+                            <div class="détail_option_plus_voté">
+                                <h4><?= htmlspecialchars($libelle_option_la_plus_votee) ?></h4>
+                                <p><?= htmlspecialchars($nb_fois_option_plus_voté) ?> votes (<?= htmlspecialchars($pourcentage_option_plus_voté) ?>%)</p>
+                            </div>
                         </div>
+<?php
+                           /* Ici on cherche à envoyer les libellés des options et le nbre de votes des option à chart JS */
+                            //on récupère l'id de chaque option de ce vote
+                            $sql_pour_obtenir_option_de_ce_vote="SELECT * FROM option_votes WHERE vote_id= :vote_id";
+                            $requete_pour_obtenir_option_de_ce_vote=$connexion->prepare($sql_pour_obtenir_option_de_ce_vote);
+                            $requete_pour_obtenir_option_de_ce_vote->execute(['vote_id' => $resultat['id']]);
+                            $resultat_pour_obtenir_option_de_ce_vote= $requete_pour_obtenir_option_de_ce_vote->fetchAll();
+                            
+                            // Arrays qui vont servir au niveau de chart.js
+                            $titre_des_options=[];
+                            $nbre_vote_option=[];
+                            //on récupère l'id de chaque option de ce vote
+                            foreach($resultat_pour_obtenir_option_de_ce_vote as $id_de_option_de_ce_vote){
+                                
+                                $sql_pour_compter_nbre_votes_sur_cette_option = "SELECT id FROM votes_utilisateur WHERE option_vote_id=:option_vote_id ";
+                                $requete_pour_compter_nbre_votes_sur_cette_option = $connexion->prepare($sql_pour_compter_nbre_votes_sur_cette_option);
+                                $requete_pour_compter_nbre_votes_sur_cette_option->execute(['option_vote_id'=> $id_de_option_de_ce_vote['id']]);
+                                $resultat_pour_compter_nbre_votes_sur_cette_option = $requete_pour_compter_nbre_votes_sur_cette_option->fetchAll();
+                                
+                                $total_votes_de_cette_option = count($resultat_pour_compter_nbre_votes_sur_cette_option);
+                                
+                                /*Explication sur ce bout de code
+                                *on stocke les libellés donc les titres des options 
+                                * on stocke le nbre de fois que chaque option a été voté
+                                *On stocke tout cela dans des arrays pour les utiliser avec Chart.js
+                                */
+                                 $titre_des_options[]= $id_de_option_de_ce_vote['libelle'];
+                                $nbre_vote_option[]= $total_votes_de_cette_option;
+                                // $donées_envoyée_à_chart_js= json_encode(['labels'=> $titre_des_options, 'values'=> $nbre_vote_option]);
+
+                            }
+                                        ?>
+                                 <script>
+                                        if (!window.données_pour_charts) {
+                                            window.données_pour_charts = {};
+                                        }
+                                        window.données_pour_charts[<?= json_encode($resultat['id']) ?>] = {
+                                            labels: <?= json_encode($titre_des_options) ?>,
+                                            values: <?= json_encode($nbre_vote_option) ?>
+                                        };
+                                    </script>
 
          <section class="graphiques_resultats">
-            <p>Repartiton des votes en pourcentages</p>
-            <div class="graphe">
-                <!-- A remplir avec celui de chart.js -->
-            </div>
+            <canvas id="graphe-<?= $resultat['id'] ?>"  class="graphe"width="80" height="80"></canvas>
+            <canvas id="schema-<?= $resultat['id'] ?>"  class="graphe"width="80" height="80"></canvas>
          </section>
 
          </section>
                         <?php
                     }
          ?>
-         <!-- 
-         
-         <section class="resultats_avec_détails">
-            <p>Résultats détaillés</p>
-
-            <div class="resultat_option">
-                <div class="option">
-                    <div class="header_option">
-                        <p class="nom_option">Logo A- Moderne</p>
-                        <p><span class="nbre_votes">52 votes</span> <span class="pourcentage_votes">39.9%</span></p>
-                    </div>
-                    <div class="barre_de_pourcentage"></div>
-                </div>
-
-                <div class="option">
-                    <div class="header_option">
-                        <p class="nom_option">Logo B- Moderne</p>
-                        <p><span class="nbre_votes">41 votes</span> <span class="pourcentage_votes">25.6%</span></p>
-                    </div>
-                    <div class="barre_de_pourcentage"></div>
-                </div>
-
-            </div>
-         </section> -->
-
+     
          <div class="overflow_blanc"></div>
     </main>
     <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
@@ -453,5 +464,10 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
         window.SESSION_VOTES = <?= json_encode($_SESSION['votes'] ?? []); ?>;
     </script>
     <script src="./script.js" defer></script>
+
+    <!-- Chart.js and page chart logic: load after DOM and after PHP-injected data -->
+    <script src="/systeme_de_votes/public/chart_js/chart.umd.min.js"></script>
+    <script src="/systeme_de_votes/public/chart_js/script_chart.js" defer></script>
+
 </body>
 </html>

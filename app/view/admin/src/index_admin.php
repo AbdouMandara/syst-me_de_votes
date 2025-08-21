@@ -2,7 +2,6 @@
 session_start();
 require_once __DIR__ . '/../../../../config/database.php';
 require_once __DIR__ . '/../../../controller/user_controller.php'
-
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -10,8 +9,7 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css">
-            <script src="/systeme_de_votes/public/chart_js/chart.umd.min.js"></script>
-
+    <script src="/systeme_de_votes/public/chart_js/chart.umd.min.js"></script>
     <script src="/systeme_de_votes/public/htmx.min-v-2.0.6.js" defer></script>
     <title>Dashboard | Admin</title>
        <script src="./script.js" defer></script>
@@ -55,9 +53,9 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                         <button class="ajout_du_vote" id="ajout_du_vote">
                             Ajouter un vote
                         </button>
-                        <button class="ajout_du_vote" id="gerer_user">
+                        <!-- <button class="ajout_du_vote" id="gerer_user">
                             Gestion des utilisateurs
-                        </button>
+                        </button> -->
                     </div>
 
             </section>
@@ -271,11 +269,7 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                                     <input type="radio" name="statut_du_vote" value="<?=$resultat_statut_vote['statut_du_vote'] ?>" id="statut_<?= $resultat_statut_vote['statut_du_vote'] ?>" <?= ($resultat['statut_du_vote'] === $resultat_statut_vote['statut_du_vote']) ? 'checked' : '' ?> >
                                     <label for="statut_<?=$resultat_statut_vote['statut_du_vote'] ?>"><?= $resultat_statut_vote['statut_du_vote'] ?> </label>
                                 </label>
-                                
-                                <!-- <label class="statut_de_vote">    
-                                    <input type="radio" name="Terminé" id="Terminé">
-                                    <label for="Terminé">Terminé </label>
-                                </label> -->
+
                                 <?php
                                 }
                                 ?>
@@ -435,10 +429,7 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                                 $nbre_vote_option[]= $total_votes_de_cette_option;
                                 // $donées_envoyée_à_chart_js= json_encode(['labels'=> $titre_des_options, 'values'=> $nbre_vote_option]);
 
-                                ?>
-                                    
-                                    <?php
-                                    }
+                                }
                                         ?>
                                  <script>
                                         if (!window.données_pour_charts) {
@@ -449,8 +440,6 @@ require_once __DIR__ . '/../../../controller/user_controller.php'
                                             values: <?= json_encode($nbre_vote_option) ?>
                                         };
                                     </script>
-
-
 
          <section class="graphiques_resultats">
             <canvas id="graphe-<?= $resultat['id'] ?>"  class="graphe"width="80" height="80"></canvas>

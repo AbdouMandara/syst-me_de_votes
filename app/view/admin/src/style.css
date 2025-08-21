@@ -823,7 +823,6 @@ main{
                     & h4{
                         font-size: var(--font-size-subtitle);
                     }
-
                 }
             }
 
@@ -842,7 +841,6 @@ main{
                     align-items: center;
                     justify-content: center;
                 }
-                    
                 }
             }
         }
@@ -904,7 +902,6 @@ main{
     border-radius: 1em;
     gap: var(--espacement-max);
     overflow-x: hidden;
-    /* box-shadow: 1px 1px 3px 0px #ff3838; */
 
     &::after{
     position: absolute;
@@ -991,9 +988,6 @@ main{
         & input{
             margin-bottom:var(--espacement-normal) ;
         }
-        /* & .option_3, & .option_4, & .option_5{
-            display: none;
-        }  */
 
     }
         & .ajouter_option_au_vote{
@@ -1109,6 +1103,4 @@ main{
         justify-content: center;
         font-size: 1.05em;
     }
-
-    
 }

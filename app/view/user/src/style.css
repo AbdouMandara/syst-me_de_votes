@@ -705,9 +705,24 @@ main{
                     & h4{
                         font-size: var(--font-size-subtitle);
                     }
-
                 }
             }
+            & .graphiques_resultats{
+                width: 100%;
+                height: max-content;
+                padding: var(--padding-secondary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                & .graphe{
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                }
         }
     
 
