@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../../config/database.php';
+require_once __DIR__ . '/../../../controller/user_controller.php'
 // require_once __DIR__ . '/../../../../public/index.php';
 ?>
 <!DOCTYPE html>
@@ -113,19 +114,39 @@ require_once __DIR__ . '/../../../../config/database.php';
                     
                     <div class="corps_votes_en_cours">
                          <?php
-                                            $sql_pour_obtenir_nbre_participants ='SELECT * FROM votes_utilisateur WHERE vote_id=:id_du_vote';
-                                            $requete_pour_obtenir_nbre_participants = $connexion->prepare($sql_pour_obtenir_nbre_participants);
-                                            $requete_pour_obtenir_nbre_participants->execute(['id_du_vote' => $resultat['id']]);
-                                            $resultat_de_la_requete_pour_obtenir_nbre_participants = $requete_pour_obtenir_nbre_participants->fetchAll();
-                                             $total_participants = count($resultat_de_la_requete_pour_obtenir_nbre_participants);
+                                $sql_pour_obtenir_nbre_participants ='SELECT * FROM votes_utilisateur WHERE vote_id=:id_du_vote';
+                                $requete_pour_obtenir_nbre_participants = $connexion->prepare($sql_pour_obtenir_nbre_participants);
+                                $requete_pour_obtenir_nbre_participants->execute(['id_du_vote' => $resultat['id']]);
+                                $resultat_de_la_requete_pour_obtenir_nbre_participants = $requete_pour_obtenir_nbre_participants->fetchAll();
+                                $total_participants = count($resultat_de_la_requete_pour_obtenir_nbre_participants);
                             ?>
                         <div class="participants"><img src="../img/users.svg" alt=""> <span><?= $total_participants ?> Participants</span></div>
                         <!-- Change image -->
                         <div class="date_de_fin"><img src="../img/users.svg" alt=""> <span>Fin : <?= $resultat['date_fin'] ?></span></div>
                     </div>
-                    <button class="bouton_de_vote" data-id-du-btn-vote="<?= $resultat['id'] ?>"   id="bouton_de_vote_<?= $resultat['id'] ?>" >Voter maintenant</button>
+                    <!-- On envoie l'id du vote en cours du btn sur le quel j'ai cliqué -->
                     <!-- Le btn ci apparaitra quand on a déja voté il a la classe "bouton_pour_voir_resultat'' car j'avais la flemme de refaire le css unique rien que pour ce btn-->
+                    <?php 
+                    $user = new UserController();
+                    if($user->déja_voté($resultat['id'], $id_user)){
+                    ?>
+                    
                     <button class="bouton_déjà_voté" id="bouton_déjà_voté_<?= $resultat['id'] ?>" data-id-du-btn-déjà-voté="<?= $resultat['id'] ?>">Dejà voté ✅</button>
+                    <?php
+                    }else{
+                        ?>
+
+                    <button class="bouton_de_vote" 
+                                    data-id-du-btn-vote="<?= $resultat['id'] ?>"   
+                                    id="bouton_de_vote_<?= $resultat['id'] ?>"
+                                    hx-post="/systeme_de_votes/public/index.php/vote_OU_déja_voté"
+                                    hx-vals='{"id_vote"}:<?= $resultat['id'] ?>,{"id_user"}:<?= $id_user ?> '
+                                    hx-target="#bouton_de_vote_<?= $resultat['id'] ?>"
+                                    hx-swap="outerHTML">Voter maintenant
+                    </button>
+                    <?php
+                        }
+                    ?>
                 </div>
                 <?php
                     } //fin du 'for each' pour afficher les votes 'actifs'
@@ -427,6 +448,10 @@ require_once __DIR__ . '/../../../../config/database.php';
          <div class="overflow_blanc"></div>
     </main>
     <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
+    <script>
+        // Exposer en JS la liste des votes déjà effectués dans la session PHP
+        window.SESSION_VOTES = <?= json_encode($_SESSION['votes'] ?? []); ?>;
+    </script>
     <script src="./script.js" defer></script>
 </body>
 </html>

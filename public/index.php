@@ -223,7 +223,12 @@ else if ($uri === '/systeme_de_votes/public/index.php/modif_vote') {
             echo '<p class="succès">' .  $_SESSION['modif_réussi'] . '</p>';
             unset($_SESSION['modif_réussi']);
         }
-    }else{
+    }
+    // On parse l'URL pour voir si un vote est déjà voté ou pas
+    else if ($uri === '/systeme_de_votes/public/index.php/vote_OU_déja_voté') {
+
+    }
+    else{
         $id_du_vote = $_POST['id_du_vote'];
             $titre_du_vote = $_POST['titre_du_vote'];
             $description_du_vote = $_POST['description_du_vote'];

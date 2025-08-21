@@ -1,5 +1,9 @@
 <?php
- require_once __DIR__ . '/../model/user_model.php';
+require_once __DIR__ . '/../model/user_model.php';
+// S'assurer que la session est démarrée pour pouvoir stocker les votes
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
  
  class UserController{
      private $nouveau_user;
@@ -70,10 +74,27 @@
                     header('HX-Redirect:/systeme_de_votes/app/view/admin/src/index_admin.php');
                     exit();
                 }
+                // On stocke également l'ID pour pouvoir charger/associer les votes
                 $_SESSION['user'] =[
+                    'id' => $user_trouvé['id'],
                     'nom'=>$user_trouvé['nom'],
                     'email'=>$user_trouvé['email']
                 ];
+
+                // Charger les votes déjà effectués par cet utilisateur et les stocker en session
+                /**
+                 * On récupère l'id du user connecté on envoie à la méthode votes_par_utilisateur pour prendre ce qu'il a voté
+                 * 
+                */
+                $votes_user = $this->nouveau_user->votes_par_utilisateur($user_trouvé['id']);
+                if (!empty($votes_user) && is_array($votes_user)) {
+                    // s'assurer que ce sont des valeurs simples (ids) 
+                    // On stocke les votes user dans une variable de SESSION pour s'en souvenir pour son utilisation
+                    $_SESSION['votes'] = array_values($votes_user);
+                } else {
+                    $_SESSION['votes'] = [];
+                }
+                // Si rien ne marche il raffraichit la page
                 header('HX-Redirect:/systeme_de_votes/app/view/user/src/index_user.php');
                 }else{
                     return $_SESSION['mot_de_passe_incorrect'] = 'mot de passe incorrect';
@@ -102,10 +123,57 @@ public function deconnexion(){
 
     public function soumission_vote($user_id, $vote_id, $option_vote_id){
         $this->nouveau_user->soumission_du_vote($user_id, $vote_id, $option_vote_id);
+        // Mettre à jour la session pour marquer ce vote comme déjà effectué
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        // Si la variable de session n'existe pas encore et c'est pas un tableau on l'initialise 
+        // C'est lors de la soumission du 1er vote
+        if (!isset($_SESSION['votes']) || !is_array($_SESSION['votes'])) {
+            $_SESSION['votes'] = [];
+        }
+        // Si le array de session pour les votes est déjà initialisé alors on y stocke l'id du nouveau vote soumis
+        $vote_id_int = is_numeric($vote_id) ? (int)$vote_id : $vote_id;
+        if (!in_array($vote_id_int, $_SESSION['votes'], true)) {
+            $_SESSION['votes'][] = $vote_id_int;
+        }
+
+        // Retour HTMX / message et bouton "déjà voté"
         echo "<script>
-                    htmx.ajax('GET', '/systeme_de_votes/public/index.php/success_message', '#success-container')
+                        htmx.ajax('GET', '/systeme_de_votes/public/index.php/success_message', '#success-container')
                   </script>";
+        echo ' <button class="bouton_déjà_voté"  disabled>Dejà voté ✅</button>';
         die();
+    }
+
+    public function déja_voté($id_vote, $id_user){
+        // Vérifier d'abord en session (plus rapide et isolé par session)
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        //Lors du chargement de la page On verifie si id du vote est déjà dans le array SESSION des votes si c'est le cas on renvoie TRUE 
+        if (isset($_SESSION['votes']) && is_array($_SESSION['votes'])) {
+            if (in_array($id_vote, $_SESSION['votes'], true)) {
+                return true;
+            }
+        }
+
+        // Sinon, vérifier en base de données on stocke le resultat obtenu
+        $result = $this->nouveau_user->déjà_voté($id_vote, $id_user);
+        if ($result) {
+            // stocker en session pour appels suivants
+            // on vérifie d'ab si le tableau des votes SESSION existe si et s'il est un array si c'est pas le cas on lui initialise un array 
+            if (!isset($_SESSION['votes']) || !is_array($_SESSION['votes'])) {
+                $_SESSION['votes'] = [];
+            }
+            // on vérifie si il est un tableau et retourne TRUE si oui on y stocke l'ID
+            if (!in_array($id_vote, $_SESSION['votes'], true)) {
+                $_SESSION['votes'][] = $id_vote;
+            }
+            return true;
+        }
+        return false;
+
     }
 }
 
@@ -143,8 +211,6 @@ class AdminController{
         return $_SESSION['modif_réussi'];
     }
 
-    //  public function obtenir_options_de_vote_et_leurs_nombre($id_du_vote){
-    //     $this->nouveau_admin->obtenir_options_de_vote_et_leurs_nombre($id_du_vote);
-    //  }
+
 }
 ?>

@@ -62,6 +62,36 @@ public function __construct()
             ':option_vote_id'=>$option_vote_id_soumis
         ]);
     }
+
+    public function déjà_voté($id_vote, $id_user){
+        $sql_pour_voir_si_ce_user_a_déjà_voté = "SELECT * FROM votes_utilisateur WHERE user_id = :user_id AND vote_id =:vote_id";
+        $requete_pour_voir_si_ce_user_a_déjà_voté = $this->connexion->prepare($sql_pour_voir_si_ce_user_a_déjà_voté);
+        $requete_pour_voir_si_ce_user_a_déjà_voté->execute(["user_id"=> $id_user, "vote_id"=> $id_vote]);
+        return $requete_pour_voir_si_ce_user_a_déjà_voté->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Retourne un tableau d'IDs de votes déjà soumis par un utilisateur.
+     * Utile pour initialiser $_SESSION['votes'] lors de la connexion.
+     * Retourne [] si aucun vote trouvé.
+     */
+    public function votes_par_utilisateur($id_user){
+        $sql_pour_trouver_vote_fait_par_user_connecté= 'SELECT vote_id FROM votes_utilisateur WHERE user_id = :user_id';
+        $requete_pour_trouver_vote_fait_par_user_connecté = $this->connexion->prepare($sql_pour_trouver_vote_fait_par_user_connecté);
+        $requete_pour_trouver_vote_fait_par_user_connecté->execute(['user_id' => $id_user]);
+        $resultat_pour_trouver_vote_fait_par_user_connecté = $requete_pour_trouver_vote_fait_par_user_connecté->fetchAll(PDO::FETCH_ASSOC);
+
+        // SI pas de vote on retourne un array vide []
+        if (!$resultat_pour_trouver_vote_fait_par_user_connecté) return [];
+        // Si on trouve on stocke ce qu'on trouve dans le tableau des ids sous forme de int pour se rassurer 😅
+        $tableau_des_ids = [];
+        foreach ($resultat_pour_trouver_vote_fait_par_user_connecté as $resultat) {
+            $tableau_des_ids[] = (int)$resultat['vote_id'];
+        }
+        // on retourne toutes les valeurs du tableau pour qu'il stocke celà 
+        // Dans le controlleur ça sera stocké en occurence par $votes_user 
+        return array_values($tableau_des_ids);
+    }
 }
 
 
@@ -275,5 +305,6 @@ class Admin{
        throw $e;
         }
     }
+
     }
 ?>

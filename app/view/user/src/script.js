@@ -76,29 +76,42 @@ document.body.addEventListener('htmx:afterSwap', (event) => {
         const success_container = event.detail.target;
         // On trouve tous les éléments liés au vote en utilisant l'ID que nous avons sauvegardé.
         const bloc_vote_cliqué_qui_est_en_cours = document.getElementById(`bloc-vote-cliqué-qui-est-en-cours-${currentVoteId}`);
-        const bouton_déjà_voté_cliqué = document.getElementById(`bouton_déjà_voté_${currentVoteId}`);
-        const bouton_vote_cliqué = document.getElementById(`bouton_de_vote_${currentVoteId}`);
+        // Mettre à jour immédiatement la liste côté client (variable exposée par PHP)
+        try {
+            // Si la variable session n'est pas un tableau alors on le rend en tableau
+            if (!Array.isArray(window.SESSION_VOTES)) {
+                window.SESSION_VOTES = [];
+            }
+            // On conserve l'id actuel dans une variable après avoir su s'il est un nbre ou pas 
+            const vid = isNaN(Number(currentVoteId)) ? currentVoteId : Number(currentVoteId);
+            // On vérifie si l'ID du vote n'est pas déjà dans la liste des votes en session
+            if (!window.SESSION_VOTES.includes(vid)) {
+                // S'il n'est pas on l'insère à la fin
+                window.SESSION_VOTES.push(vid);
+            }
 
-        //On récupère les votes précédents
-        /**
-         * Donc quand je confirme mon vote je récupères la valeur de la variable 'votes_déjà_votés'ou de sa clé dans le LocalStorage
-         * Si j'ai au préalable déjà confirmé un vote sinon je crées un tableau vide à cette meme variable que je vais modifier au fur et à mesure
-         * Ensuite j'utilises JSON.parse pour convertir ma string JSON obtenu en objet pour pouvoir ajouter des nouvelles clés(ID des votes) et valeur 
-         */
-        let votes_déjà_votés = JSON.parse(localStorage.getItem("votes_déjà_votés") || "[]");
+            // Mettre à jour l'interface : afficher 'Déjà voté' et supprimer le bouton 'Voter maintenant'
+            const bouton_déjà_voté_cliqué = document.getElementById(`bouton_déjà_voté_${currentVoteId}`);
+            const bouton_vote_cliqué = document.getElementById(`bouton_de_vote_${currentVoteId}`);
 
-        //On ajoute le nouveau vote
-        /**
-         * J'ajoute à la fin de l'objet l'id du vote en cours 
-         */
-        votes_déjà_votés.push(currentVoteId);
-
-        //On sauvegarde le tableau mis à jour
-        /**
-         * On stocke sur notre array ou string JSON car le localStorage ne prend que ça 
-         * On utilise JSON.stringify pour convertir notre tableau et/ou objet en string JSON
-         */
-        localStorage.setItem("votes_déjà_votés", JSON.stringify(votes_déjà_votés));
+            if (bouton_déjà_voté_cliqué) {
+                afficherElement(bouton_déjà_voté_cliqué);
+            } else if (bouton_vote_cliqué) {
+                // Remplacer le bouton de vote par un bouton déjà voté si nécessaire
+                // * c'est meme pas important tout ce code car je connais déjà le bouton 'déjà voté qui apparaitra [T'as mal copilot]
+                const btn = document.createElement('button');
+                btn.className = 'bouton_déjà_voté';
+                btn.id = `bouton_déjà_voté_${currentVoteId}`;
+                btn.disabled = true;
+                btn.textContent = 'Dejà voté ✅';
+                bouton_vote_cliqué.replaceWith(btn);
+            }
+            if (bouton_vote_cliqué) {
+                bouton_vote_cliqué.remove();
+            }
+        } catch (e) {
+            console.warn('Erreur lors de la mise à jour client des votes en session :', e);
+        }
 
 
         // On utilise un timeout pour laisser à l'utilisateur le temps de voir le message de succès.
@@ -106,13 +119,6 @@ document.body.addEventListener('htmx:afterSwap', (event) => {
             // On supprime le message de succès.
             if (success_container.firstElementChild) {
                 success_container.removeChild(success_container.firstElementChild);
-            }
-            // On met à jour l'interface : on affiche 'Déjà voté' et on supprime 'Voter maintenant'.
-            if (bouton_déjà_voté_cliqué) {
-                afficherElement(bouton_déjà_voté_cliqué);
-            }
-            if (bouton_vote_cliqué) {
-                bouton_vote_cliqué.remove();
             }
             // On cache la fenêtre de vote.
             if (bloc_vote_cliqué_qui_est_en_cours) {
@@ -135,13 +141,10 @@ document.body.addEventListener('htmx:afterSwap', (event) => {
     }
 });
 
-// Au chargement de la page, on vérifie les votes déjà effectués
+// Au chargement de la page, on vérifie les votes déjà effectués (données exposées par PHP)
 document.addEventListener("DOMContentLoaded", () => {
-    /**
-     * Au chargement du DOM je convertis ma clé stockée sur le localStorage en objet 
-     * Ensuite je l'utilises pour l'affichage des btn 'Déjà voté' et on supprime 'Voter maintenant'.
-     */
-    let votes_déjà_votés = JSON.parse(localStorage.getItem("votes_déjà_votés") || "[]");
+    // Utilise la variable exposée par PHP : window.SESSION_VOTES
+    let votes_déjà_votés = Array.isArray(window.SESSION_VOTES) ? window.SESSION_VOTES : [];
 
     votes_déjà_votés.forEach(id_vote_déjà_voté => {
         const bouton_déjà_voté_cliqué = document.getElementById(`bouton_déjà_voté_${id_vote_déjà_voté}`);
