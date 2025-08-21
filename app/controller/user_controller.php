@@ -116,6 +116,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 public function deconnexion(){
+    // Quand je me déconnectes je vides la session de mes infos
+    $_SESSION['votes']=[];
     session_destroy();
     header('HX-Redirect:/systeme_de_votes/public/index.php');
 }
