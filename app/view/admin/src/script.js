@@ -24,16 +24,18 @@ function hauteur_overflow(params) {
 let nbre_option = 3;
 let id_option_3 =window.id_option_3;
 let libelle_option_3 =window.libelle_option_3;
+
 function afficher_option(les_options_du_vote, ajouter_option_au_vote) {
  hauteur_overflow(overflow)
-    les_options_du_vote.insertAdjacentHTML("beforeend",`<input type="text" class="option_${nbre_option}" name="option_${nbre_option}_du_vote" id="${id_option_3}" placeholder="Option ${nbre_option}" value="${libelle_option_3}">`)
+    les_options_du_vote.insertAdjacentHTML("beforeend",`<input type="text" class="option_${nbre_option}" name="option_${nbre_option}_du_vote" id="${id_option_3}" placeholder="Option ${nbre_option}" ">`)
     // les_options_du_vote.insertAdjacentHTML("beforeend",`<input type="hidden" name="id_option_${nbre_option}_du_vote" value="<?= $resultat_pour_avoir_l_id_d_options[2]['id'] ?>">` )
     nbre_option++
-    if (nbre_option > 3) {
-        ajouter_option_au_vote.disabled=true;
-        ajouter_option_au_vote.removeEventListener("click", afficher_option())
-        ajouter_option_au_vote.style.cursor="no-drop"
-    }
+            if (nbre_option > 3) {
+                // Désactive le bouton et change le curseur. La suppression de l'écouteur
+                // est effectuée depuis le gestionnaire qui a ajouté l'écouteur (même référence).
+                ajouter_option_au_vote.disabled = true;
+                ajouter_option_au_vote.style.cursor = "no-drop";
+            }
 }
 
 /*____________________________________________________________________________ */
@@ -63,6 +65,21 @@ overflow.addEventListener("click", ()=>{
     cacherElement(formulaire_pour_ajout_vote)
 })
 
+//  Pour ajouter une option sur le formulaire où on ajoute un vote
+const les_options_du_vote = document.querySelector("#formulaire_pour_ajout_vote > .les_options_du_vote")
+const btn_ajouter_option = document.querySelector("#ajouter_option_au_vote")
+
+// Handler nommé — nécessaire pour pouvoir retirer l'écouteur avec la même référence
+const handleAjouterOption = () => {
+    afficher_option(les_options_du_vote, btn_ajouter_option);
+    // Si le nombre d'options dépasse la limite, on retire l'écouteur en utilisant
+    // la référence `handleAjouterOption`.
+    if (nbre_option > 3) {
+        btn_ajouter_option.removeEventListener("click", handleAjouterOption);
+    }
+};
+
+btn_ajouter_option.addEventListener("click", handleAjouterOption)
 
 const overflow_blanc = document.querySelector(".overflow_blanc")
 const main = document.querySelector("main")
@@ -132,7 +149,7 @@ document.querySelectorAll(".modifier_vote").forEach(btn_modifier_vote =>{
         })
         
         
-    // Pour augmenter le nbre d'options 
+    // Pour augmenter le nbre d'options  _ Annuler
 //  document.querySelectorAll(".form_modif_votes > .ajouter_option_au_vote").forEach(btn_ajout_option =>{
 //         btn_ajout_option.addEventListener("click", () => {
 //             const les_options_du_vote = document.querySelector(`#formulaire_pour_modifier_vote_${id_btn_modifier_vote} > .les_options_du_vote`)
